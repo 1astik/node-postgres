@@ -1,0 +1,540 @@
+openapi: 3.0.3
+info:
+  title: Node-postgres
+  description: SPA description
+  version: 0.0.1
+servers:
+  - url: 'localhost:8090'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+        nickname:
+          type: string
+    Tag:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        sortOrder:
+          type: number
+          default: 0
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+paths:
+  /signin:
+    post:
+      summary: Registration
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - nickname
+              properties:
+                email:
+                  type: string
+                  maxLength: 100
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 100
+                nickname:
+                  type: string
+                  minLength: 3
+                  maxLength: 30
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - token
+                  - expire
+                properties:
+                  token:
+                    type: string
+                  expire:
+                    type: number
+        '400':
+          description: Bad credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /login:
+    post:
+      summary: Login
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  maxLength: 100
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 100
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - token
+                  - expire
+                properties:
+                  token:
+                    type: string
+                  expire:
+                    type: number
+        '400':
+          description: Bad credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /logout:
+    post:
+      summary: Refresh bearer token
+      tags:
+        - Auth
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - token
+                  - expire
+                properties:
+                  token:
+                    type: string
+                  expire:
+                    type: number
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /user:
+    get:
+      summary: Retrieve user
+      tags:
+        - User management
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  nickname:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Tag'
+    put:
+      summary: Create user
+      tags:
+        - User management
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - nickname
+              properties:
+                email:
+                  type: string
+                  maxLength: 100
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 100
+                nickname:
+                  type: string
+                  minLength: 3
+                  maxLength: 30
+      responses:
+        '201':
+          description: Create
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Not valid email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+    delete:
+      summary: Delete user
+      tags:
+        - User management
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /tag:
+    get:
+      summary: Retrieves all tags
+      tags:
+        - Tag management
+      parameters:
+        - in: query
+          name: limit
+          description: number of tags per page
+          schema:
+            type: integer
+        - in: query
+          name: page
+          description: page to retrieve
+          schema:
+            type: integer
+        - in: query
+          name: sortByName
+          schema:
+            type: string
+            maxLength: 40
+        - in: query
+          name: sortByOrder
+          schema:
+            type: number
+            maxLength: 1000
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        creator:
+                          type: object
+                          properties:
+                            nickname:
+                              type: string
+                            uid:
+                              type: string
+                        name:
+                          type: string
+                        sortOrder:
+                          type: number
+                  meta:
+                    type: object
+                    properties:
+                      offset:
+                        type: number
+                      length:
+                        type: number
+                      quantity:
+                        type: number
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+    post:
+      summary: Create tag
+      tags:
+        - Tag management
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 40
+                sortOrder:
+                  type: number
+                  default: 0
+              required: [ name ]
+      responses:
+        '201':
+          description: Create
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /tag/{id}:
+    get:
+      summary: Get tag
+      tags:
+        - Tag management
+      parameters:
+        - in: path
+          required: true
+          name: id
+          schema:
+            type: number
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Get
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  creator:
+                    type: object
+                    properties:
+                      nickname:
+                        type: string
+                      uid:
+                        type: string
+                  name:
+                    type: string
+                  sortOrder:
+                    type: number
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+    put:
+      summary: Update tag
+      tags:
+        - Tag management
+      parameters:
+        - in: path
+          required: true
+          name: id
+          schema:
+            type: number
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 40
+                sortOrder:
+                  type: number
+                  default: 0
+      responses:
+        '200':
+          description: Update
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+    delete:
+      summary: Delete tag
+      tags:
+        - Tag management
+      parameters:
+        - in: path
+          required: true
+          name: id
+          schema:
+            type: number
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /user/tag:
+    post:
+      summary: Create user tag
+      tags:
+        - UserTag management
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    type: number
+              required: [ tags ]
+      responses:
+        '200':
+          description: Create
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Tag'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /user/tag/{id}:
+    delete:
+      summary: Create user tag
+      tags:
+        - UserTag management
+      parameters:
+        - in: path
+          required: true
+          name: id
+          schema:
+            type: number
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Create
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Tag'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /user/tag/my:
+    get:
+      summary: Get user tags
+      tags:
+        - UserTag management
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Create
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Tag'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+
+
