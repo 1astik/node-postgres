@@ -6,7 +6,7 @@ const {EntityExists, Unauthorized} = require('utils/error')
 
 
 /**
- * @param {import('./validation/signin.body').Credentials} credentials 
+ * @param {import('./validation/login.body').Credentials} credentials
  */
 async function login(credentials) {
     const userRecord = await userRepository.getUserByEmailForLogin(credentials.email)
@@ -22,18 +22,22 @@ async function login(credentials) {
     return getAuthResponse(userRecord.uid)
 }
 
-async function signin(user) {
-    user.password = await bcrypt.hash(user.password, 10)
+/**
+ * @param {import('./validation/signin.body').Credentials} credentials
+ * @return {Promise<{expire: Number, token: String}>}
+ */
+async function signin(credentials) {
+    credentials.password = await bcrypt.hash(credentials.password, 10)
 
-    const userRecord = await userRepository.saveUser(user)
+    const userRecord = await userRepository.saveUser(credentials)
 
     return getAuthResponse(userRecord.uid)
 }
 
-async function refreshToken(uid) {
-    return getAuthResponse(uid)
-}
-
+/**
+ * @param {String} uid
+ * @return {{expire: Number, token: String}}
+ */
 function getAuthResponse(uid) {
     const jwt = jsonwebtoken.sign(
         {
@@ -75,9 +79,9 @@ async function authorization(bearerToken) {
     if (bearer !== 'Bearer')
         throw new Unauthorized()
 
-    const playload = verifyJwt(jwt)
+    const payload = verifyJwt(jwt)
 
-    const user = await userRepository.getUserByUid(playload.uid)
+    const user = await userRepository.getUserByUid(payload.uid)
 
     if (!user)
         throw new Unauthorized()
@@ -90,5 +94,5 @@ module.exports = {
     login,
     signin,
     authorization,
-    refreshToken
+    getAuthResponse
 }

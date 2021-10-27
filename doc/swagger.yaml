@@ -136,7 +136,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
-  /logout:
+  /refresh_token:
     post:
       summary: Refresh bearer token
       tags:

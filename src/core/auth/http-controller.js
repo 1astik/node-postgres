@@ -35,11 +35,15 @@ module.exports.signin = asyncHttpWrapper(
 )
 
 module.exports.refreshToken = asyncHttpWrapper(
+    /**
+     * @param {import('express').Request} req
+     * @param {import('express').Response} res
+     */
     async (req, res) => {
 
         validationId(req.user.uid)
 
-        const response = await service.refreshToken(req.user.uid)
+        const response = service.getAuthResponse(req.user.uid)
 
         res.status(200).json(response)
     }
