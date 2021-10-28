@@ -29,3 +29,6 @@ COMMON:
 | JWT_EXPIRE                        | integer | 1800
 | HTTP_PORT                         | integer | 8090    
 
+Command for start Docker:
+===
+"docker-compose up"
