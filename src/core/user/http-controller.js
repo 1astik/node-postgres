@@ -1,4 +1,5 @@
 const service = require('./service')
+const tagService = require('../tag/service')
 const validation = require('./validation')
 const {validationId, validationMyNumber} = require('utils/validation')
 const {asyncHttpWrapper} = require('utils/error-wrappers')
@@ -12,9 +13,11 @@ module.exports.getUser = asyncHttpWrapper(
     async (req, res) => {
         validationId(req.user.uid)
 
-        const response = await service.getUser(req.user.uid)
+        const user = await service.getUser(req.user.uid)
+        const tags = await tagService.getMyTags(user.usertag, req.user.uid)
+        delete user.usertag
 
-        res.status(201).json(response)
+        res.status(201).json({...user, tags})
     }
 )
 
@@ -41,6 +44,7 @@ module.exports.deleteUser = asyncHttpWrapper(
     async (req, res) => {
         validationId(req.user.uid)
 
+        await tagService.deleteTagByCreator(req.user.uid)
         await service.deleteUser(req.user.uid)
 
         res.status(200).json('User is delete!')

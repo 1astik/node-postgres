@@ -10,7 +10,7 @@ module.exports = {
     properties: {
         tags: {
             type: 'array',
-        },
+        }
     },
     additionalProperties: false,
     required: ['tags'],

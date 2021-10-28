@@ -1,5 +1,3 @@
-
-
 /**
  * @typedef CreateUserBody
  * @type {Object}
@@ -17,7 +15,7 @@ module.exports = {
             emailValidator: true,
             transform: ['trim', 'toLowerCase'],
             errorMessage: {
-                maxLength: 'The email address cannot be longer than 50 characters',
+                maxLength: 'The email address cannot be longer than 100 characters',
                 emailValidator: 'Invalid email address'
             }
         },

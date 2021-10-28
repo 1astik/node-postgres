@@ -26,17 +26,17 @@ const getUserByUid = async (uid) => {
 
 const updateUser = async ({email, password, nickname, uid}) => {
     const response = await db.query(`UPDATE "user"
-                                     set email = COALESCE($1, email),
+                                     SET email = COALESCE($1, email),
                                          password = COALESCE($2, password),
                                          nickname = COALESCE($3, nickname)
-                                     where uid = $4 RETURNING *`, [email, password, nickname, uid]).catch(err => err)
+                                     WHERE uid = $4 RETURNING *`, [email, password, nickname, uid]).catch(err => err)
 
     return new User(response).getUser()
 }
 
 const deleteUserByUid = async (uid) => {
     const response = await db.query(`DELETE FROM "user"
-                                     where uid = $1`, [uid]).catch(err => err)
+                                     WHERE uid = $1`, [uid]).catch(err => err)
 
     return new User(response).getUser()
 }
@@ -48,16 +48,16 @@ const addMyTags = async (tags, creatorId) => {
     })
 
     const response = await db.query(`UPDATE "user"
-                                     set usertag = array_cat(usertag, $1)
-                                     where uid = $2 RETURNING *`, [tagsId, creatorId]).catch(err => err)
+                                     SET usertag = array_cat(usertag, $1)
+                                     WHERE uid = $2 RETURNING *`, [tagsId, creatorId]).catch(err => err)
 
     return new User(response).getUser()
 }
 
 const deleteUserTagById = async (userId, tagId) => {
     const response = await db.query(`UPDATE "user"
-                                     set usertag = array_remove(usertag, $1)
-                                     where uid = $2 RETURNING *`, [tagId, userId]).catch(err => err)
+                                     SET usertag = array_remove(usertag, $1)
+                                     WHERE uid = $2 RETURNING *`, [tagId, userId]).catch(err => err)
 
     return new User(response).getUser()
 }

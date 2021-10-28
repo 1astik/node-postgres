@@ -9,10 +9,8 @@ async function getUser(userId) {
     const user = await repository.getUserByUid(userId)
 
     delete user.uid
-    delete user.usertag
-    const tags = await getMyTags(userId)
 
-    return {...user, tags}
+    return user
 }
 
 /**
@@ -28,16 +26,19 @@ async function putUser(user) {
 }
 
 /**
- * @param {String} uid
+ * @param {String} userId
  * @return {void}
  */
-async function deleteUser(uid) {
-    await tagService.deleteTagByCreator(uid)
-    await repository.deleteUserByUid(uid)
+async function deleteUser(userId) {
+    await repository.deleteUserByUid(userId)
 
     return void 0
 }
 
+/**
+ * @param {String} creatorId
+ * @return {{id: Number, name: String, sortByOrder: Number}[]}
+ */
 async function getMyTags(creatorId) {
     const user = await repository.getUserByUid(creatorId)
 
@@ -49,7 +50,11 @@ async function getMyTags(creatorId) {
     return tags
 }
 
-
+/**
+ * @param {{tags: String[]}} data
+ * @param {String} creatorId
+ * @return {tags: Array}
+ */
 async function addMyTags(data, creatorId) {
     const tagsFind = await tagService.getMyTags(data.tags, creatorId)
 
@@ -60,6 +65,11 @@ async function addMyTags(data, creatorId) {
     return await getMyTags(creatorId)
 }
 
+/**
+ * @param {String} userId
+ * @param {Number} tagId
+ * @return {tags: Array}
+ */
 async function deleteUserTagById(userId, tagId) {
     await repository.deleteUserTagById(userId, tagId)
 
