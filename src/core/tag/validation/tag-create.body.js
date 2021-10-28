@@ -1,7 +1,5 @@
-
-
 /**
- * @typedef CreateUserBody
+ * @typedef CreateTagBody
  * @type {Object}
  * @property {String} name
  * @property {Number} sortOrder
@@ -16,7 +14,7 @@ module.exports = {
             maxLength: 40,
             transform: ['trim'],
             errorMessage: {
-                maxLength: 'The email address cannot be longer than 50 characters',
+                maxLength: 'The name cannot be longer than 40 characters',
             }
         },
         sortOrder: {

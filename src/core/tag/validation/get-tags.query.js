@@ -1,5 +1,3 @@
-
-
 /**
  * @typedef GetTagsQuery
  * @type {Object}
@@ -37,7 +35,7 @@ module.exports = {
             type: 'string',
             maxLength: 40,
             errorMessage: {
-                maxLength: 'The name address cannot be longer than 40 characters',
+                maxLength: 'The sortByName cannot be longer than 40 characters',
             }
         },
         sortByOrder: {

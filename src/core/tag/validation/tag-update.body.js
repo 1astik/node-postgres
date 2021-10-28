@@ -1,5 +1,3 @@
-
-
 /**
  * @typedef UpdateTagBody
  * @type {Object}
@@ -16,7 +14,7 @@ module.exports = {
             maxLength: 40,
             transform: ['trim'],
             errorMessage: {
-                maxLength: 'The name address cannot be longer than 40 characters',
+                maxLength: 'The name cannot be longer than 40 characters',
             }
         },
         sortOrder: {
